@@ -51,18 +51,6 @@ ADD *snapshot*.json /
 # Restore the snapshot to install custom nodes
 RUN /restore_snapshot.sh
 
-# Ensure directories exist before downloading files
-RUN mkdir -p models/checkpoints models/loras
-
-RUN wget -O models/checkpoints/juggernaut.safetensors "https://civitai.com/api/download/models/274039?type=Model&format=SafeTensor&size=pruned&fp=fp16"
-RUN wget -O models/loras/pixel.safetensors "https://civitai.com/api/download/models/135931?type=Model&format=SafeTensor"
-RUN wget -O models/loras/cinematic.safetensors "https://civitai.com/api/download/models/131991?type=Model&format=SafeTensor"
-RUN wget -O models/loras/digitale.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
-RUN wget -O models/loras/animae.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
-RUN wget -O models/loras/cyberpunk.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
-RUN wget -O models/loras/digitall.safetensors "https://civitai.com/api/download/models/270254?type=Model&format=SafeTensor&token=67d65600f8854efcd070ea49b88e7afd"
-RUN wget -O models/loras/comics.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor&token=67d65600f8854efcd070ea49b88e7afd"
-
 # Start container
 CMD ["/start.sh"]
 
@@ -76,7 +64,18 @@ ARG MODEL_TYPE
 WORKDIR /comfyui
 
 # Create necessary directories
-RUN mkdir -p models/checkpoints models/vae
+RUN mkdir -p models/checkpoints models/vae models/unet models/clip models/loras models/upscale_models
+
+RUN wget -O models/checkpoints/juggernaut.safetensors "https://civitai.com/api/download/models/274039?type=Model&format=SafeTensor&size=pruned&fp=fp16"
+RUN wget -O models/loras/pixel.safetensors "https://civitai.com/api/download/models/135931?type=Model&format=SafeTensor"
+RUN wget -O models/loras/cinematic.safetensors "https://civitai.com/api/download/models/131991?type=Model&format=SafeTensor"
+RUN wget -O models/loras/digitale.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
+RUN wget -O models/loras/animae.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
+RUN wget -O models/loras/cyberpunk.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor"
+RUN wget -O models/loras/digitall.safetensors "https://civitai.com/api/download/models/270254?type=Model&format=SafeTensor&token=67d65600f8854efcd070ea49b88e7afd"
+RUN wget -O models/loras/comics.safetensors "https://civitai.com/api/download/models/305491?type=Model&format=SafeTensor&token=67d65600f8854efcd070ea49b88e7afd"
+RUN wget -O models/upscale_models/RealESRGAN_x2.pth "https://huggingface.co/ai-forever/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth"
+
 
 # Download checkpoints/vae/LoRA to include in image based on model type
 RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
