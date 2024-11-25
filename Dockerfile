@@ -96,11 +96,17 @@ RUN if [ "$MODEL_TYPE" = "sdxl" ]; then \
       wget --header="Authorization: Bearer ${HUGGINGFACE_ACCESS_TOKEN}" -O models/vae/ae.safetensors https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors; \
     fi
 
+# Archive models into a single tarball to simplify copying
+RUN tar -czf /comfyui_models.tar.gz -C /comfyui/models .
+
 # Stage 3: Final image
 FROM base as final
 
 # Copy models from stage 2 to the final image
-COPY --from=downloader /comfyui/models /comfyui/models
+COPY --from=downloader /comfyui_models.tar.gz /
+
+# Extract the models into the final image
+RUN tar -xzf /comfyui_models.tar.gz -C /comfyui && rm /comfyui_models.tar.gz
 
 # Start container
 CMD ["/start.sh"]
